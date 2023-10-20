@@ -18,7 +18,7 @@ function showCityContainer() {
 }
 
 // Функция показа контейнера с ошибкой
-function showCityContainer() {
+function showErrorContainer() {
     weatherContainer.style.display = "none"
     cityContainer.style.display = "none"
     errorContainer.style.display = "flex"
@@ -39,8 +39,6 @@ findCityButton.onclick = function() {
 
     let enteredCity = document.getElementById("inputToFindCity").value
     coords = getCoordsFromCity(enteredCity)
-    console.log(coords[0])
-    console.log(coords[1])
 }
 
 // Автоматическое определение местоположения пользователя
@@ -50,7 +48,7 @@ navigator.geolocation.getCurrentPosition(
 	}
 )
 
-// Функция определения погоды по автоматическому местоположению
+// Функция определения погоды по координатам
 function getWeatherFromCoords(lat, lon) {
     fetch('https://api.openweathermap.org/data/2.5/onecall?lat=' + lat.toFixed(2) + '&lon=' + lon.toFixed(2) + '&lang=ru&units=metric&appid=bd69def61e044b12aa285f853e73965f')
         .then((response) => {
@@ -68,9 +66,9 @@ function getCoordsFromCity(city) {
             return response.json()
         })
         .then((data) => {
-            let coords = new Array()
-            coords[0] = data[0].lat
-            coords[1] = data[0].lon
+            let lat = data[0].lat
+            let lon = data[0].lon
+            showWeatherContainer()
+            getWeatherFromCoords(lat, lon)
         })
-    return coords
 }
