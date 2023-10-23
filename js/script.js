@@ -53,15 +53,48 @@ tryAgainButton.onclick = function() {
 }
 
 // Автоматическое определение местоположения и погоды пользователя
-navigator.geolocation.getCurrentPosition(
-    function(position) {
-        getWeatherFromCoords(position.coords.latitude, position.coords.longitude, null)
-	}
-)
+navigator.geolocation.getCurrentPosition(geolocationSuccess, geolocationFailure)
+
+// Если пользователь разрешил доступ к геолокации
+function geolocationSuccess(position) {
+	getWeatherFromCoords(position.coords.latitude, position.coords.longitude, null)
+}
+
+// Если пользователь запретил доступ к геолокации
+function geolocationFailure(positionError) {
+    fetch('https://api.ipify.org?format=json')
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            getCityFromIp(data.ip)
+        })
+        .catch(error => {
+            console.error("Произошла ошибка при определении погоды: " + error.message)
+            showErrorContainer()
+        })
+}
+
+// Функция определения координат города по ip
+function getCityFromIp(ip) {
+    fetch('https://geo.ipify.org/api/v2/country,city?apiKey=at_ISXaZUxRVDqIABeOyYv6ey7EiI3HN&ipAddress=' + ip)
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            console.log(data)
+            
+            getWeatherFromCoords(data.location.lat, data.location.lng, null)
+        })
+        .catch(error => {
+            console.error("Произошла ошибка при определении города: " + error.message)
+            showErrorContainer()
+        })
+}
 
 // Функция определения погоды по координатам
 function getWeatherFromCoords(lat, lon, cityName) {
-    fetch('https://api.openweathermap.org/data/2.5/weather?lat=' + lat.toFixed(2) + '&lon=' + lon.toFixed(2) + '&units=metric&appid=bd69def61e044b12aa285f853e73965f')
+    fetch('https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + lon + '&units=metric&appid=bd69def61e044b12aa285f853e73965f')
         .then((response) => {
             return response.json()
         })
@@ -94,7 +127,7 @@ function getWeatherFromCoords(lat, lon, cityName) {
             weatherInCity.append(description + " in " + city)
         })
         .catch(error => {
-            console.error("Произошла ошибка: " + error.message)
+            console.error("Произошла ошибка при определении погоды: " + error.message)
             showErrorContainer()
         })
 }
@@ -117,7 +150,7 @@ function getCoordsFromCity(city) {
             getWeatherFromCoords(lat, lon, cityName)
         })
         .catch(error => {
-            console.error("Произошла ошибка: " + error.message)
+            console.error("Произошла ошибка при определении местоположения города: " + error.message)
             showErrorContainer()
         })
 }
