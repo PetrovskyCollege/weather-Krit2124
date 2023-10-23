@@ -35,14 +35,14 @@ changeCityButton.onclick = function() {
     showCityContainer()
 }
 
-//Кнопка поиска температуры по городу
+// Кнопка поиска температуры по городу
 let findCityButton = document.getElementById("findCityButton")
 findCityButton.onclick = function() {
     // Изменение текущего окна
     showWeatherContainer()
 
     let enteredCity = document.getElementById("inputToFindCity").value
-    coords = getCoordsFromCity(enteredCity)
+    getCoordsFromCity(enteredCity)
 }
 
 // Кнопка для перехода на ввод города с окна ошибки
