@@ -28,7 +28,7 @@ function showErrorContainer() {
     errorContainer.style.display = "flex"
 }
 
-// Кнопка для перехода на ввод города
+// Кнопка для перехода на ввод города с окна погоды
 let changeCityButton = document.getElementById("changeCityButton")
 changeCityButton.onclick = function() {
     // Изменение текущего окна
@@ -43,6 +43,13 @@ findCityButton.onclick = function() {
 
     let enteredCity = document.getElementById("inputToFindCity").value
     coords = getCoordsFromCity(enteredCity)
+}
+
+// Кнопка для перехода на ввод города с окна ошибки
+let tryAgainButton = document.getElementById("tryAgainButton")
+tryAgainButton.onclick = function() {
+    // Изменение текущего окна
+    showCityContainer()
 }
 
 // Автоматическое определение местоположения и погоды пользователя
@@ -86,6 +93,10 @@ function getWeatherFromCoords(lat, lon, cityName) {
             weatherInCity.innerHTML = ''
             weatherInCity.append(description + " in " + city)
         })
+        .catch(error => {
+            console.error("Произошла ошибка: " + error.message)
+            showErrorContainer()
+        })
 }
 
 // Функция определения координат города
@@ -104,5 +115,9 @@ function getCoordsFromCity(city) {
 
             // Определение погоды по координатам
             getWeatherFromCoords(lat, lon, cityName)
+        })
+        .catch(error => {
+            console.error("Произошла ошибка: " + error.message)
+            showErrorContainer()
         })
 }
