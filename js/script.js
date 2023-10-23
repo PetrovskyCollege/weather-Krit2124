@@ -3,6 +3,10 @@ let weatherContainer = document.getElementsByClassName("weatherContainer")[0]
 let cityContainer = document.getElementsByClassName("cityContainer")[0]
 let errorContainer = document.getElementsByClassName("errorContainer")[0]
 
+// Получение блоков для вывода температуры
+let temperatureValue = document.getElementsByClassName("temperatureValue")[0]
+let weatherInCity = document.getElementsByClassName("weatherInCity")[0]
+
 // Функция показа контейнера с погодой
 function showWeatherContainer() {
     weatherContainer.style.display = "flex"
@@ -41,21 +45,46 @@ findCityButton.onclick = function() {
     coords = getCoordsFromCity(enteredCity)
 }
 
-// Автоматическое определение местоположения пользователя
+// Автоматическое определение местоположения и погоды пользователя
 navigator.geolocation.getCurrentPosition(
     function(position) {
-        getWeatherFromCoords(position.coords.latitude, position.coords.longitude)
+        getWeatherFromCoords(position.coords.latitude, position.coords.longitude, null)
 	}
 )
 
 // Функция определения погоды по координатам
-function getWeatherFromCoords(lat, lon) {
-    fetch('https://api.openweathermap.org/data/2.5/onecall?lat=' + lat.toFixed(2) + '&lon=' + lon.toFixed(2) + '&lang=ru&units=metric&appid=bd69def61e044b12aa285f853e73965f')
+function getWeatherFromCoords(lat, lon, cityName) {
+    fetch('https://api.openweathermap.org/data/2.5/weather?lat=' + lat.toFixed(2) + '&lon=' + lon.toFixed(2) + '&units=metric&appid=bd69def61e044b12aa285f853e73965f')
         .then((response) => {
             return response.json()
         })
         .then((data) => {
             console.log(data)
+            
+            // Изменение текущего окна
+            showWeatherContainer()
+
+            // Получение необходимых данных из Json
+            let temp = data.main.temp
+            let description = data.weather[0].description
+            let city
+            if (cityName == null) {
+                city = data.name
+            }
+            else {
+                city = cityName
+            }
+
+            // Преобразование первой буквы описания погоды в заглавную
+            description = description[0].toUpperCase() + description.slice(1)
+
+            // Вывод полученной температуры
+            temperatureValue.innerHTML = ''
+            temperatureValue.append(temp + " ℃")
+
+            // Вывод полученного описания погоды и города
+            weatherInCity.innerHTML = ''
+            weatherInCity.append(description + " in " + city)
         })
 }
 
@@ -66,9 +95,14 @@ function getCoordsFromCity(city) {
             return response.json()
         })
         .then((data) => {
+            console.log(data)
+
+            // Получение координат из Json
             let lat = data[0].lat
             let lon = data[0].lon
-            showWeatherContainer()
-            getWeatherFromCoords(lat, lon)
+            let cityName = data[0].name
+
+            // Определение погоды по координатам
+            getWeatherFromCoords(lat, lon, cityName)
         })
 }

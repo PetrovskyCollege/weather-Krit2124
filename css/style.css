@@ -45,7 +45,7 @@ main {
 }
 
 .weatherContainer {
-    width: 200px;
+    width: 500px;
     height: 187px;
 
     display: flex;
